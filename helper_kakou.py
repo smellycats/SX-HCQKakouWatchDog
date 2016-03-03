@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import json
+
 import requests
 
 class Kakou(object):
@@ -9,8 +11,9 @@ class Kakou(object):
 
     def get_kakou_count(self, st, et, kkdd, fxbh):
         """根据时间,地点,方向获取车流量"""
-        url = 'http://{host}:{port}/index.php/kakou/carinfo?q={kkdd}+st:{st}+et:{et}+fxbh:{fxbh}'.format(
+        url = 'http://{host}:{port}/rest_hcq_kakou/index.php/kakou/carinfo?q={kkdd}+st:{st}+et:{et}+fxbh:{fxbh}'.format(
             host=self.host, port=self.port, st=st, et=et, kkdd=kkdd, fxbh=fxbh)
+        #print url
         try:
             r = requests.get(url, headers=self.headers)
             if r.status_code == 200:
@@ -21,10 +24,10 @@ class Kakou(object):
 
     def get_kkdd(self, kkdd_id):
         """获取卡口地点"""
-        url = 'http://{host}:{port}/index.php/kakou/kkdd/{kkdd_id}'.format(
+        url = 'http://{host}:{port}/rest_hcq_kakou/index.php/kakou/kkdd/{kkdd_id}'.format(
             host=self.host, port=self.port, kkdd_id=kkdd_id)
         try:
-            r = requests.get(url, headers)
+            r = requests.get(url, self.headers)
             if r.status_code == 200:
                 return json.loads(r.text)['items']
         except Exception as e:
