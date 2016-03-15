@@ -3,10 +3,8 @@ from helper_sms import SMS
 from helper_kakou import Kakou
 
 kakou_ini = {'host': '10.47.187.123', 'port': 80}
-sms_ini = {
-    'host': '10.47.187.123',
-    'port': 8090
-}
+sms_ini = {'host': '10.47.187.123', 'port': 8090}
+
 def get_kkdd_test():
     kk = Kakou(**kakou_ini)
     print kk.get_kkdd('441302')
