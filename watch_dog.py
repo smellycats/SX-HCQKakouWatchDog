@@ -52,15 +52,12 @@ class WatchDog(object):
     def sms_send_info(self, sms_send_list):
         """发送短信通知"""
         t = arrow.now()
-
-        content = ''
+        content = u'[惠城区卡口报警]\n'
         for i in sms_send_list:
-            content += u'[{kkdd},{fxbh}]'.format(
+            content += u'[{kkdd},{fxbh}]\n'.format(
                 kkdd=i['kkdd'], fxbh=i['fx'])
         content += u'超过1小时没数据'
-        print content
-        #self.sms.sms_send(content, self.mobiles_list)
-
+        self.sms.sms_send(content, self.mobiles_list)
 
     def check_kakou_count(self):
         """遍历检测所有卡口方向车流量"""
@@ -91,7 +88,6 @@ class WatchDog(object):
                         sms_send_list.append(
                             {'kkdd': i['kkdd_name'], 'fx': self.fxbh_dict[fx]})
         if sms_send_list:
-            print 'done'
             self.sms_send_info(sms_send_list)
         
     def run(self):
