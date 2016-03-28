@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 import json
 
 import requests
@@ -9,8 +9,8 @@ class SMS(object):
     def __init__(self, **kwargs):
         self.host = kwargs['host']
         self.port = kwargs['port']
-        self.username = kwargs['username']
-	self.password = kwargs['password']
+        self.user = kwargs['user']
+	self.pwd = kwargs['pwd']
         self.headers = {'content-type': 'application/json'}
 
     def sms_send(self, content, mobiles):
@@ -19,7 +19,7 @@ class SMS(object):
         data = {'content': content, 'mobiles': mobiles}
         try:
             r = requests.post(url, headers=self.headers, data=json.dumps(data),
-			      auth=HTTPBasicAuth(self.username, self.password))
+			      auth=HTTPBasicAuth(self.user, self.pwd))
             if r.status_code == 201:
                 return json.loads(r.text)
         except Exception as e:
