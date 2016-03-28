@@ -11,20 +11,11 @@ from helper_kakou import Kakou
 
 class WatchDog(object):
     def __init__(self):
-        # 时间标记
         self.date_flag = arrow.now().replace(hours=-1)
-        # 待发送的手机号码
-        self.mobiles_list = ['123']
-        self.kakou_ini = {
-            'host': '10.47.187.123',
-            'port': 80
-        }
-        self.sms_ini = {
-            'host': '10.47.187.123',
-            'port': 8090,
-            'username': 'test1',
-            'password': '123456'
-        }
+
+        self.my_ini = MyIni()
+        self.mobiles_list = self.my_ini.get_mobiles()['number'].split(',')
+
         self.fxbh_dict = {
             'IN': u'进城',
             'OT': u'出城',
@@ -34,12 +25,12 @@ class WatchDog(object):
             'NS': u'北往南',
             'QT': u'其他'
         }
-        self.sms = SMS(**self.sms_ini)
-        self.kakou = Kakou(**self.kakou_ini)
+        self.sms = SMS(**self.my_ini.get_sms())
+        self.kakou = Kakou(**self.my_ini.get_kakou())
         self.kkdd_list = []
         # 短信发送记录，形如{('441302001', 'IN'): <Arrow [2016-03-02T20:08:58.190000+08:00]>}
         self.sms_send_dict = {}
-        self.sms_send_time = 6
+        self.sms_send_time = 7
 
     def __del__(self):
         pass
@@ -57,6 +48,7 @@ class WatchDog(object):
             content += u'[{kkdd},{fxbh}]\n'.format(
                 kkdd=i['kkdd'], fxbh=i['fx'])
         content += u'超过1小时没数据'
+
         self.sms.sms_send(content, self.mobiles_list)
 
     def check_kakou_count(self):
@@ -81,7 +73,7 @@ class WatchDog(object):
                         sms_send_list.append(
                             {'kkdd': i['kkdd_name'], 'fx': self.fxbh_dict[fx]})
                         continue
-                    # 当前时间 大于6am，并且当前时间大于历史记录发送时间18小时
+                    # 当前时间大于6am，并且当前时间大于历史记录发送时间18小时
                     if t.datetime.hour > self.sms_send_time and \
                        t > last_send_date.replace(hours=18):
                         self.sms_send_dict[(i['kkdd_id'], fx)] = t
@@ -96,7 +88,7 @@ class WatchDog(object):
                 # 当前时间
                 t = arrow.now()
                 # 每10分钟检查一遍
-                if t > self.date_flag.replace(minutes=1):
+                if t > self.date_flag.replace(minutes=10):
                     self.get_kkdd_list()
                     self.check_kakou_count()
                     self.date_flag = t
@@ -113,3 +105,4 @@ if __name__ == "__main__":
     wd.run()
     #print wd.hbc_count('2014-02-03')
     del wd
+
