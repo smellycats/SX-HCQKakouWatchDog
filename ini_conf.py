@@ -14,6 +14,8 @@ class MyIni(object):
         section = 'KAKOU'
         conf['host'] = self.cf.get(section, 'host')
         conf['port'] = self.cf.getint(section, 'port')
+	conf['username'] = self.cf.get(section, 'username')
+	conf['password'] = self.cf.get(section, 'password')
         return conf
 
     def get_sms(self):
