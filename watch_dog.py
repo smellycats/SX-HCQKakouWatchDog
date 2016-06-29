@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 import time
 import json
 
@@ -6,7 +6,7 @@ import arrow
 import requests
 
 from helper_sms import SMS
-from helper_kakou import Kakou
+from helper_kakou2 import Kakou
 from ini_conf import MyIni
 
 
@@ -35,7 +35,7 @@ class WatchDog(object):
         self.kkdd_list = []
         # 短信发送记录，形如{('441302001', 'IN'): <Arrow [2016-03-02T20:08:58.190000+08:00]>}
         self.sms_send_dict = {}
-        self.sms_send_time = 7
+        self.sms_send_time = 6
 
     def __del__(self):
         pass
@@ -43,8 +43,12 @@ class WatchDog(object):
     def get_kkdd_list(self):
         """卡口地点列表"""
         self.kkdd_list = []
-        for i in ['441302', '441304']:
-            self.kkdd_list += self.kakou.get_kkdd(i)
+        for i in ['441302', '4413040']:
+            for j in self.kakou.get_kkdd(i):
+	        if j['banned'] == 0:
+	    	    self.kkdd_list.append({'kkdd_id': j['id'],
+					   'kkdd_name': j['name'],
+				           'fxbh_list': j['fxbh_list']})
 
     def sms_send_info(self, sms_send_list):
         """发送短信通知"""
@@ -66,6 +70,7 @@ class WatchDog(object):
 	is_sms_send = False
 
         for i in self.kkdd_list:
+	    #print i
             for fx in i['fxbh_list']:
                 # 计算卡口最新1小时流量
                 count = self.kakou.get_kakou_count(
@@ -117,8 +122,8 @@ class WatchDog(object):
                     self.check_kakou_count()
                     self.time_flag = t
             except Exception as e:
-                print e
-		raise
+                #print e
+		#raise
                 time.sleep(10)
             finally:
                 time.sleep(1)
