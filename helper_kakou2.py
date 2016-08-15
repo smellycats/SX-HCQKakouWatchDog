@@ -13,18 +13,23 @@ class Kakou(object):
 	self.password = kwargs['password']
         self.headers = {'content-type': 'application/json'}
 
+	self.status = False
+
     def get_kakou_count(self, st, et, kkdd, fxbh):
         """根据时间,地点,方向获取车流量"""
         url = 'http://%s:%s/stat?q={"st":"%s","et":"%s","kkbh":"%s","fxbh":"%s"}' % (
             self.host, self.port, st, et, kkdd, fxbh)
-        print url
         try:
             r = requests.get(url, headers=self.headers,
 			     auth=HTTPBasicAuth(self.username, self.password))
             if r.status_code == 200:
                 return json.loads(r.text)['count']
+            else:
+                self.status = False
+                raise Exception('url: %s, status: %s, %s' % (
+                    url, r.status_code, r.text))
         except Exception as e:
-            print e
+	    self.status = False
             raise
 
     def get_kkdd(self, kkdd_id):
@@ -36,7 +41,11 @@ class Kakou(object):
 		 	     auth=HTTPBasicAuth(self.username, self.password))
             if r.status_code == 200:
                 return json.loads(r.text)['items']
+            else:
+                self.status = False
+                raise Exception('url: %s, status: %s, %s' % (
+                    url, r.status_code, r.text))
         except Exception as e:
-            print e
+	    self.status = False
             raise
 
