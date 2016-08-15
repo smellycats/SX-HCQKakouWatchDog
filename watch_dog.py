@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 import time
 import json
 
@@ -8,6 +8,11 @@ import requests
 from helper_sms import SMS
 from helper_kakou2 import Kakou
 from ini_conf import MyIni
+from my_logger import *
+
+
+debug_logging(u'/home/logs/error.log')
+logger = logging.getLogger('root')
 
 
 class WatchDog(object):
@@ -70,7 +75,6 @@ class WatchDog(object):
 	is_sms_send = False
 
         for i in self.kkdd_list:
-	    #print i
             for fx in i['fxbh_list']:
                 # 计算卡口最新1小时流量
                 count = self.kakou.get_kakou_count(
@@ -79,17 +83,13 @@ class WatchDog(object):
                     kkdd=i['kkdd_id'], fxbh=fx)
                 
                 # 如果车流量为0则发送短信
-                if count <= 0:
+                if count == 0:
 		    # 该卡口最近发送日期
                     last_send_date = self.sms_send_dict.get(
                         (i['kkdd_id'], fx), None)
                     # 没有发送记录的
                     if last_send_date is None:
-                        sms_send_list.append(
-                            {'kkdd': i['kkdd_name'], 'fx': self.fxbh_dict[fx],
-                             'kkdd_id': i['kkdd_id'], 'fx_code': fx})
 			is_sms_send = True
-			continue
 
                     # 当前时间大于7am，并且发送日期更新
                     if t.datetime.hour > self.sms_send_time and \
@@ -122,8 +122,7 @@ class WatchDog(object):
                     self.check_kakou_count()
                     self.time_flag = t
             except Exception as e:
-                #print e
-		#raise
+                logger.error(e)
                 time.sleep(10)
             finally:
                 time.sleep(1)
